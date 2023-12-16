@@ -66,43 +66,14 @@ impl Almanac {
         }
     }
 
-    pub fn get_seeds_from_pairs(&self) -> Vec<u128> {
-        let mut final_seeds = vec![];
+    pub fn get_seeds_from_pairs(&self) -> Vec<Vec<u128>> {
+        let mut final_seeds_ranges = vec![];
         let mut actual_seeds = self.seeds.clone();
         while actual_seeds.len() >= 2 {
             let start_and_end: Vec<u128> = actual_seeds.drain(0..2).collect();
-            println!("start_and_end: {:?}", start_and_end);
             let range: Vec<u128> = vec![start_and_end[0], start_and_end[0] + start_and_end[1]];
-            println!("range: {:?}", range);
-
-            let filtered_seeds = self.seeds_from_range(range);
-            // Map Converters and reduce the number of Seeds to lookup for
-
-            final_seeds.extend(filtered_seeds);
-            // println!("final_seeds: {:#?}", final_seeds);
+            final_seeds_ranges.push(range);
         }
-        final_seeds
-    }
-
-    pub fn seeds_from_range(&self, range: Vec<u128>) -> Vec<u128> {
-        let mut seeds = vec![];
-        let soil_converters = self.maps.get("seed-to-soil").unwrap();
-        for i in 0..soil_converters.len() {
-            let start = soil_converters[i].source_start;
-            let end = soil_converters[i].source_start + soil_converters[i].range - 1;
-            if range[1] < start {
-                seeds.push(range[0])
-            } else if range[0] <= start && range[1] >= start {
-                seeds.push(start)
-            } else if range[0] > start && range[0] < end {
-                seeds.push(range[0])
-            } else if range[0] > end {
-                seeds.push(range[0])
-            }
-        }
-        seeds.sort();
-        seeds.dedup();
-        println!("seeds: {:#?}", seeds);
-        seeds
+        final_seeds_ranges
     }
 }

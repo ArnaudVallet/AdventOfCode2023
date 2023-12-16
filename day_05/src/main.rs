@@ -1,6 +1,8 @@
 mod types;
 
+use std::cmp::min;
 use std::collections::HashMap;
+use std::f64::INFINITY;
 use std::fs;
 use types::almanac::Almanac;
 
@@ -10,7 +12,7 @@ fn main() {
         seeds: vec![],
     };
 
-    let file_path = "light-input.txt";
+    let file_path = "input.txt";
 
     // Read the content of the file
     if let Ok(file_content) = fs::read_to_string(file_path) {
@@ -38,15 +40,21 @@ fn main() {
         .min()
         .unwrap();
 
-    let seeds = almanac.get_seeds_from_pairs();
-    println!("seeds: {:#?}", seeds);
-    let result2 = seeds
-        .iter()
-        .map(|seed| almanac.find_location_from(*seed))
-        .min()
-        .unwrap();
+    let seeds_ranges = almanac.get_seeds_from_pairs();
+    println!("seeds_ranges: {:#?}", seeds_ranges);
+
+    // For loop on ranges
+    let mut result2: u128 = INFINITY as u128; 
+    for i in 0..seeds_ranges.len() {
+        let range = &seeds_ranges[i];
+        let start = range[0];
+        let end = range[1];
+        for seed_num in start..end {
+            let location = almanac.find_location_from(seed_num);
+            result2 = min(location, result2);
+        }
+    }
 
     println!("Result 1: {}", result1);
-
-    println!("Result 2: {}", result2); // 219 974 726
+    println!("Result 2: {}", result2); // This will take time... 2h30 for me ¯\_(ツ)_/¯
 }
